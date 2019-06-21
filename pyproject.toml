@@ -1,0 +1,12 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "configz"
+author = "Joni Turunen"
+home-page = "http://typingducks.com"
+classifiers = ["License :: OSI Approved :: MIT License"]
+
+[tool.flit.scripts]
+cli = "configz.cfz:main"
