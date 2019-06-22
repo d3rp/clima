@@ -62,3 +62,4 @@ used/activated
   * code completion should work in the IDE
   * configure should know to chain config file with params
   * ...
+* maybe a logging setup (--dryrun)

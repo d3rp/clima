@@ -1,16 +1,20 @@
-from configz import c
+from configz import c, replace_signatures
 from fire import Fire
 
 
 class Cli:
-    def __init__(self, **ps):
-        c(**ps)
-        print(f'configured c: {repr(c())}')
-
-    def foo(self):
+    def foo(self, **ps):
         """docstring wtf"""
-        print(c().b)
+        print(c(ps))
+
+    def dir(self, test, testx=None):
+        print(Cli.dir.__get__)
 
 
 def main():
+    replace_signatures(Cli)
     Fire(Cli)
+
+
+if __name__ == '__main__':
+    main()
