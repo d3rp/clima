@@ -1,23 +1,15 @@
-from configz import C, c, configure
+from configz import c
 from fire import Fire
 
-from pprint import pformat
 
 class Cli:
     def __init__(self, **ps):
-        configure(**ps)
-        self.c = c()
+        c(**ps)
+        print(f'configured c: {repr(c())}')
 
-    def foo(self, **params):
+    def foo(self):
         """docstring wtf"""
         print(c().b)
-
-    def bar(self, x=None):
-        print('oh hi')
-
-    def baz(self):
-        pformat(C._field_defaults)
-
 
 
 def main():
