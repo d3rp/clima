@@ -2,18 +2,52 @@
 
 QDCT .. rolls off your tongue nice and easy.
 
+To wrap your scripts as command line commands without
+fussing about and maintaining argument parsing etc.
+while still having the typical usage options available.
+
+This idea is centred around a global configuration which
+is populated with given arguments falling back optional on
+defined defaults in the code and/or a configuration file.
+
+## Preliminary installations
+
+### pipenv
+
+    # From the beginning...
+    pip install -U pip pipenv
+    
+    # on some mac configurations, when pipenv isn't included in the path..
+    sudo -H pip install -U pip pipenv
+    
+### pipenv environment
+
+    pipenv install --ignore-pipfile
+    
+    # activate the environment alternative 1
+    pipenv shell
+    
+    # activate the environment alternative 2
+    pipenv run <command>
+    
+Note: consecutive steps presume the pipenv environment is being
+used/activated
+
+## Installing as command line command
+
     # Create pyproject.toml
     flit init 
     
     # Install dev version (omit --symlinks for more permanent solution):
     flit install --symlink
 
+## Usage
+
     # Test the damage
-    pipenv shell
     cli -- -h
     cli -- -i
     
-TODO:
+## TODO:
 
 * Show params in help / How to pass namedtuple's signature programmatically to the Cli functions?    
   * Need to do code generation i.e. write the signature into a separate python file and eval that?
