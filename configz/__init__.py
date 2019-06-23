@@ -13,11 +13,7 @@ class C(NamedTuple):
     x: int = 1
 
 
-class AC(C):
-    b = 'c'
-
-
-def c(params: Optional[dict] = None, __c=[]) -> C:
+def c(params: Optional[dict] = None, *, __c=[]) -> C:
     if params is not None:
         __c.append(C(**ChainMap(params, C()._asdict())))
     elif len(__c) == 0:
@@ -25,9 +21,11 @@ def c(params: Optional[dict] = None, __c=[]) -> C:
     return __c[-1]
 
 
-def replace_signatures(cls, T: NamedTuple = C):
-    """Uses the implicit Configuration NamedTuple's fields to
-    replace existing methods' signatures
+def prepare_signatures(cls, T: NamedTuple = C):
+    """Uses the implicit Configuration NamedTuple's fields as the
+    classes methods' signatures i.e. helps fire to show up the
+    named tuple's arguments instead of a generic "**params" for the
+    subcommands on command line.
 
     Works in-place, returns None
     """
