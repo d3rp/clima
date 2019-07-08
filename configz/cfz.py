@@ -1,10 +1,18 @@
-from configz import c, prepare_signatures
-from fire import Fire
+from typing import NamedTuple
+from configz import prepare, c
+
+
+class Configuration(NamedTuple):
+    a: str = 'a'  # a description
+    b: str = 'b'  # b description
+    x: int = 1  # x description
+    y: int = 0  # y description
 
 
 class Cli:
     def __init__(self, **ps):
-        c(ps)
+        print('init')
+        c(ps, Configuration())
 
     def foo(self):
         """docstring wtf"""
@@ -12,13 +20,13 @@ class Cli:
         print(c())
 
     def bar(self):
+        """Docstring ftw"""
         print('bar')
         print(Cli.dir.__get__)
 
 
 def main():
-    prepare_signatures(Cli)
-    Fire(Cli)
+    prepare(Cli, Configuration())
 
 
 if __name__ == '__main__':
