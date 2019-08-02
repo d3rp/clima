@@ -1,6 +1,6 @@
 """"Slim boilerplate for cli scripts"""
 
-from typing import NamedTuple, Optional, TypeVar, Generic, NewType
+from typing import NamedTuple, Optional, TypeVar, Generic, NewType  # , NoneType
 from collections import ChainMap, OrderedDict
 import inspect
 import configparser
@@ -10,7 +10,7 @@ from functools import lru_cache
 
 __version__ = '0.0.1'
 
-C = TypeVar('C', NamedTuple, None)
+C = TypeVar('C', NamedTuple, type(None))
 
 
 def filter_config_fields(d: dict, nt):
@@ -22,25 +22,45 @@ def get_config_file(_filepath='test.cfg'):
     if not filepath.exists():
         return {}
 
-    config = configparser.ConfigParser()
-    config.read(filepath)
-    return dict(config['Default'])
+    file_config = configparser.ConfigParser()
+    file_config.read(filepath)
+    return dict(file_config['Default'])
 
 
-def c(params: dict = None, Conf: C = None, *, __c=[]) -> C:
-    conf = NewType('conf', C)
-    # print(type(conf))
-    # print(params)
-    if params is not None:
-        __c.append(conf(dict(ChainMap(
+# TODO: Requires some metaclass magic to return a class of a type that isn't yet defined here
+class Configurable:
+    this: C = None
+
+    def __call__(self, params: dict, Conf: C):
+        conf = NewType('conf', C)
+        self.this = conf(dict(ChainMap(
             params,
             # filter_config_fields(get_config_file(), conf()),
             # filter_config_fields(os.environ, conf()),
             Conf._asdict()
-        ))))
-    elif len(__c) == 0:
-        __c.append(conf())
-    return __c[-1]
+        )))
+        self.__annotations__.update({'foo': 'bar'})
+
+    def __getattr__(self, item):
+        return self.this[item]
+
+c = Configurable()
+
+
+# def c(params: dict = None, Conf: C = None, *, __c=[]) -> C:
+#     conf = NewType('conf', C)
+#     # print(type(conf))
+#     # print(params)
+#     if params is not None:
+#         __c.append(conf(dict(ChainMap(
+#             params,
+#             # filter_config_fields(get_config_file(), conf()),
+#             # filter_config_fields(os.environ, conf()),
+#             Conf._asdict()
+#         ))))
+#     elif len(__c) == 0:
+#         __c.append(conf())
+#     return __c[-1]
 
 
 def prepare_signatures(cls, nt: NamedTuple):

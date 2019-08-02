@@ -1,5 +1,6 @@
 from typing import NamedTuple
-from configz import prepare, c
+from configz import prepare  #, c
+from tester import c
 
 
 class Configuration(NamedTuple):
@@ -17,7 +18,8 @@ class Cli:
     def foo(self):
         """docstring wtf"""
         print('foo')
-        print(c())
+        print(c.x)
+        print(c.__annotations__)
 
     def bar(self):
         """Docstring ftw"""
