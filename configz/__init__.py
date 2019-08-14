@@ -29,20 +29,25 @@ def get_config_file(_filepath='test.cfg'):
 
 # TODO: Requires some metaclass magic to return a class of a type that isn't yet defined here
 class Configurable:
-    this: C = None
+    configured: C = None
 
-    def __call__(self, params: dict, Conf: C):
-        conf = NewType('conf', C)
-        self.this = conf(dict(ChainMap(
+    def __call__(self, params: dict, configuration_tuple: C):
+        configuration = NewType('conf', C)
+        self.configured = configuration(dict(ChainMap(
             params,
             # filter_config_fields(get_config_file(), conf()),
             # filter_config_fields(os.environ, conf()),
-            Conf._asdict()
+            configuration_tuple._asdict()
         )))
         self.__annotations__.update({'foo': 'bar'})
 
+
     def __getattr__(self, item):
-        return self.this[item]
+        res = None
+        if self.configured is not None:
+            res = self.configured[item]
+
+        return res
 
 c = Configurable()
 
