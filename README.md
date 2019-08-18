@@ -128,18 +128,21 @@ container with quick access with attributes `c.a`, `c.x`, ...
 
 Output should resemble this:
 
-    $ tester subcommand-foo -- -h
     
-    Type:        method
-    String form: <bound method Cli.subcommand_foo of <__main__.Cli object at 0x000002995AD74BE0>>
-    File:        C:\Users\foobar\code\py\clinfig\tester\__main__.py
-    Line:        18
-    Docstring:   This will be shown in --help for subcommand-foo
-    Args:
-        --a (str): a description (Default is 'A')
-        --x (int): x description (Default is 1)
+```
+$ tester subcommand-foo -- -h
 
-    Usage:       __main__.py subcommand-foo [--X ...]
+Type:        method
+String form: <bound method Cli.subcommand_foo of <__main__.Cli object at 0x000002995AD74BE0>>
+File:        C:\Users\foobar\code\py\clinfig\tester\__main__.py
+Line:        18
+Docstring:   This will be shown in --help for subcommand-foo
+Args:
+    --a (str): a description (Default is 'A')
+    --x (int): x description (Default is 1)
+
+Usage:       __main__.py subcommand-foo [--X ...]
+```
 
 ## Configuration file and environment variables
 
