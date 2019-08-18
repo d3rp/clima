@@ -1,35 +1,32 @@
 from typing import NamedTuple
-from configz import prepare  #, c
-from tester import c
+from clinfig import prepare, c
 
 
-# class Configuration(NamedTuple):
-#     a: str = 'a'  # a description
-#     b: str = 'b'  # b description
-#     x: int = 1  # x description
-#     y: int = 0  # y description
+class Configuration(NamedTuple):
+    a: str = 'A'  # a description
+    x: int = 1  # x description
+
+
+# Hack to enable autocompletion in IDEs
+c: Configuration = c
 
 
 class Cli:
     def __init__(self, **ps):
-        print('init')
-        c(ps, type(c)())
+        c(ps, Configuration())
 
-    def foo(self):
-        """docstring wtf"""
+    def subcommand_foo(self):
+        """This will be shown in --help for subcommand-foo"""
         print('foo')
-        print(c.x)
-        print(c.__annotations__)
+        print(repr(c))
 
-    def bar(self):
-        """Docstring ftw"""
+    def subcommand_bar(self):
+        """This will be shown in --help for subcommand-bar"""
         print('bar')
-        print(Cli.dir.__get__)
 
 
 def main():
-    prepare(Cli, type(c)())
-    # prepare(Cli, Configuration())
+    prepare(Cli, Configuration())
 
 
 if __name__ == '__main__':
