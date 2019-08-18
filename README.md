@@ -1,17 +1,17 @@
 # Quick and dirty cli templating
 
-Create command line interface boilerplate enabling configuration
-files and env variable overloading in addition to command line arguments
-by defining a simple schema of the
-configuration and a class with your "business logic".
+Create a semi-self-documenting command line interface boilerplate loading configuration
+files and enabling env variable overloading in addition to command line arguments
+by defining a simple schema of the configuration and a class with your "business logic".
 
 In other words, use this to wrap your scripts as command line commands without
-fussing about and maintaining argument parsing
-while still having the typical usage options available.
-This idea is centred around a premise of a global configuration which
-would be used through out the user code. That configuration
+fussing about and maintaining argument parsing and duplicating comments for help or remembering
+what the arguments were and did
+while still having the typical use experience of a cli program (e.g. --help, subcommands, ...).
+This implementation is focused on a premise that for a simple script you have a global configuration which
+would be used through out the user code i.e. a context for the program. That configuration
 is populated with given arguments falling back on
-defaults in the code and an optional configuration file.
+defaults in the code and some further complimentary options.
 
 Should work for linux, macos and windows.
 
@@ -46,17 +46,10 @@ used/activated
 
 * fire - python-fire from google does the cli wrapping
 
-## Installing as command line program i.e. a command
-
-    # Create pyproject.toml
-    flit init 
-    
-    # Install dev version (omit --symlink for more permanent solution):
-    flit install --symlink
 
 ## Usage
 
-See the example file in tester/__main__.py. Here's a run down of the individual
+See the example file in `tester/__main__.py`. Here's a run down of the individual
 parts in it.
 
 In your code define the schema as a NamedTuple:
@@ -65,78 +58,99 @@ In your code define the schema as a NamedTuple:
         a: str = 'A'  # a description
         x: int = 1  # x description
 
-"Configuration" is an arbitrary name, no magic there. The inherited NamedTuple does the
-heavy lifting for it simplifying the schemas templating to defining just the attributes. Those
-have a set way:
+"Configuration" is an arbitrary name, no magic there. The inherited NamedTuple
+simplifies the schema's templating to defining just the attributes (i.e. `a` and `x` in this
+example). Those have a set way:
 
+        # attribute: type = default value  # Description for the --help
         a: str = 'A'  # a description
        
-'a' is the attribute which can be called in the code later with 'c.a'. It has a type of 'str', default
+`a` is the attribute which can be called in the code later with `c.a`. It has a type of 'str', default
 value of 'A'. The comment after it is parsed for the command line so it's not redundant. All of these
 parts will be parsed for the '--help' for the subcommands of the cli, which should be defined as follows:
 
     class Cli:
-        def __init__(self, **ps):
-            c(ps, Configuration())
+        def __init__(self, **cli_args):
+            c(**cli_args, Configuration())
 
         def subcommand_foo(self):
             """This will be shown in --help for subcommand-foo"""
             print('foo')
-            print(repr(c))
+            print(c.a)
+            print(c.x)
 
         def subcommand_bar(self):
             """This will be shown in --help for subcommand-bar"""
             print('bar')
 
-The methods are parsed as subcommands for the cli and their respective doc strings will show in the 
-subcommands' help print out. Note the usage of the parsed configuration 'c':
+The `__init__` works as a funnel for the command line arguments baking them into the configuration `c` i.e.
+the argument parsing is done here:
 
-    print(repr(c))
+    def __init__(self, **cli_args):
+        c(cli_args, Configuration())
+    
+The methods are parsed as subcommands for the cli and their respective doc strings will show in the 
+subcommands' help print out. Note the usage of the parsed configuration `c`:
+
+    print(c.a)
+    print(c.x)
    
-The implicit step to enable this magic is importing c from configz:
+The implicit step to enable this magic is importing c from *clinfig*:
 
     from clinfig import c
             
-          
-The parameter parsing is done here:
-
-    c(ps, Configuration())
-
-Lsstly, the preparation for all of the above:
-
+Lsstly, the preparation for the command line --help:
 
     def main():
         prepare(Cli, Configuration())
         
-In which the defined class for the command line business logic is given as the first parameter for the
-prepare function imported:
+In which the defined class for the command line business logic and the schema class (NamedTuple) is given as the first parameter for the
+previously imported prepare function:
 
     from clinfig import prepare
     
-The schema/template class is also given to it so it can do its magic mangling for the configuration.
-When all is complete, the imported 'c' variable should have all the bits and pieces for the configuration.
-
-    # Test the damage (presuming you did the flit step above)
-    tester -- -h
-    tester subcommand-foo -- -h
-    tester subcommand-bar
-
 Also, to enable autocompletion in IDEs, this hack is needed for the time being:
 
     c: Configuration = c
 
-Put it in the "global space". See the tester/__main__.py for an example.
+Put it in the "global space" just after defining the template. See the `tester/__main__.py` for a specific example.
+
+When all is complete, the imported `c` variable should have all the bits and pieces for the configuration. It can be
+used inside the Cli class as well as imported around the codebase thus encapsulating all the configurations into one
+container with quick access with attributes `c.a`, `c.x`, ...
+
+### Running the cli
+
+    # Test the damage (presuming you did the flit step below)
+    tester -- -h
+    tester subcommand-foo -- -h
+    tester subcommand-bar
+
+Output should resemble this:
+
+    $ tester subcommand-foo -- -h
+    
+    Type:        method
+    String form: <bound method Cli.subcommand_foo of <__main__.Cli object at 0x000002995AD74BE0>>
+    File:        C:\Users\foobar\code\py\clinfig\tester\__main__.py
+    Line:        18
+    Docstring:   This will be shown in --help for subcommand-foo
+    Args:
+        --a (str): a description (Default is 'A')
+        --x (int): x description (Default is 1)
+
+    Usage:       __main__.py subcommand-foo [--X ...]
 
 ## Configuration file and environment variables
 
-The 'prepare' function chains multiple configuration steps in order of priority:
+The 'prepare' function chains multiple configuration steps in order of priority (lower number overrides higher number):
 
 1. command line arguments
 1. Environment variables
 1. configuration file definitions
 1. defaults in the schema/template/namedtuple class
 
-The configuration file should be named 'test.cfg' (see TODO) and have an ini type formatting with
+The configuration file should be named `test.cfg` (see TODO) and have an ini type formatting with
 a 'Default' section:
 
     # test.cfg
@@ -149,6 +163,14 @@ Same applies for the env variables.
     # linux example
     X=2 tester subcommand-foo
     
+## Installing as command line program i.e. a command
+
+    # Create pyproject.toml
+    flit init 
+    
+    # Install dev version (omit --symlink for more permanent solution):
+    flit install --symlink
+   
 ## DONE:
 
 * Show params in help / How to pass namedtuple's signature programmatically to the Cli functions?    
@@ -172,3 +194,8 @@ Same applies for the env variables.
 * tooling and installation helpers
   * flit is not working on windows at least..
   * dephell or alternative to allow dev with whatever setup
+* Configuration file requires copying clinfig in the same directory with the user code
+* parsing configuration and help/description require separate steps
+  * would be nice to have a single point of access and import requirement
+* base level help (<script> -- -h) doesn't printout the subcommands
+* look into autocompletion options (iirc, fire might have sth out-of-the-box)

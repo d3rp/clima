@@ -12,17 +12,19 @@ c: Configuration = c
 
 
 class Cli:
-    def __init__(self, **ps):
-        c(ps, Configuration())
+    def __init__(self, **cli_args):
+        c(cli_args, Configuration())
 
     def subcommand_foo(self):
         """This will be shown in --help for subcommand-foo"""
         print('foo')
-        print(repr(c))
+        print(c.a)
+        print(c.x)
 
     def subcommand_bar(self):
         """This will be shown in --help for subcommand-bar"""
         print('bar')
+        print(repr(c))
 
 
 def main():
