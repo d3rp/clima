@@ -36,8 +36,11 @@ def cfgs_gen(f):
 def find_cfg(f):
     f = Path(f)
     cfgs = list(cfgs_gen(f))
-    if len(cfgs) == 0 and is_in_module(f):
-        return find_cfg(f.parent)
+    if len(cfgs) == 0:
+        if is_in_module(f):
+            return find_cfg(f.parent)
+        else:
+            return None
     else:
         return cfgs[0]
 
@@ -62,11 +65,15 @@ class Configurable:
         if is_initializing:
 
             config_file = self.__get_config_path(configuration_tuple)
-
+            if config_file is not None:
+                config_dict = filter_fields(read_config(config_file), configuration_tuple),
+            else:
+                config_dict = {}
+                
             configuration = NewType('conf', C)
             self.configured = configuration(dict(ChainMap(
                 params,
-                filter_fields(read_config(config_file), configuration_tuple),
+                config_dict,
                 filter_fields(os.environ, configuration_tuple),
                 configuration_tuple._asdict()
             )))
