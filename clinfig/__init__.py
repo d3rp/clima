@@ -13,20 +13,36 @@ __version__ = '0.0.1'
 
 C = TypeVar('C', bound=NamedTuple)
 
+root = Path.cwd()
+
 
 def filter_fields(d: dict, nt):
     res = {}
     for k, v in d.items():
-        # print(f'validating {k}: {v}')
         if k in nt._fields:
-            # print(f'accepted {k}: {v}')
             res.update({k: v})
 
     return res
-    # return {k: v for k, v in d.items() if k in nt._fields}
 
 
-def get_config_file(_filepath='test.cfg'):
+def is_in_module(f):
+    return len(list(Path(f).parent.glob('__init__.py')))
+
+
+def cfgs_gen(f):
+    yield from Path(f).parent.glob('*.cfg')
+
+
+def find_cfg(f):
+    f = Path(f)
+    cfgs = list(cfgs_gen(f))
+    if len(cfgs) == 0 and is_in_module(f):
+        return find_cfg(f.parent)
+    else:
+        return cfgs[0]
+
+
+def read_config(_filepath='test.cfg') -> dict:
     filepath = Path(_filepath)
     if not filepath.exists():
         return {}
@@ -41,19 +57,33 @@ class Configurable:
     configured: C = None
 
     def __call__(self, params: dict = None, configuration_tuple: Generic[C] = None) -> C:
-        if params is not None and configuration_tuple is not None:
+
+        is_initializing = (params is not None and configuration_tuple is not None)
+        if is_initializing:
+
+            config_file = self.__get_config_path(configuration_tuple)
+
             configuration = NewType('conf', C)
             self.configured = configuration(dict(ChainMap(
                 params,
-                filter_fields(get_config_file(), configuration_tuple),
+                filter_fields(read_config(config_file), configuration_tuple),
                 filter_fields(os.environ, configuration_tuple),
                 configuration_tuple._asdict()
             )))
 
-            # self.configured: configuration = configuration_factory(configuration_tuple)
-
-
         return self.configured
+
+    def __get_config_path(self, configuration_tuple):
+        client_file = Path(inspect.getfile(configuration_tuple.__class__))
+        if hasattr(configuration_tuple, 'cwd'):
+            p = Path(configuration_tuple._asdict()['cwd'])
+            if not p.absolute():
+                p = client_file / p
+        else:
+            p = client_file
+        config_file = find_cfg(p)
+
+        return config_file
 
     def __repr__(self):
         return repr(self.configured)
