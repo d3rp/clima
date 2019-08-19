@@ -149,6 +149,7 @@ def prepare_signatures(cls, nt: C):
         ])
 
 
+# TODO: pass class instead of instance
 def prepare(cls, nt: C):
     prepare_signatures(cls, nt)
     wrap_method_docs(cls, nt)
@@ -187,9 +188,13 @@ class Doc:
             _type, def_desc = _def.split('=')
             _type = _type.strip()
 
-            default, description = def_desc.split('#')
-            default = default.strip()
-            description = description.strip()
+            if '#' in def_desc:
+                default, description = def_desc.split('#')
+                default = default.strip()
+                description = description.strip()
+            else:
+                default = def_desc.strip()
+                description = ''
 
             _attr_map.update(
                 {
@@ -216,6 +221,6 @@ class Doc:
 
         ps_doc = '\n'.join(ps_doc)
         doc = f.__doc__
-        doc += '\nArgs:\n' + ps_doc
+        doc = (doc if doc is not None else '') + '\nArgs:\n' + ps_doc
         # print(repr(f))
         f.__doc__ = doc
