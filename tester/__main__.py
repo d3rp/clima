@@ -1,4 +1,4 @@
-from clinfig import c, NamedTuple
+from fissle import c, NamedTuple
 
 
 @c

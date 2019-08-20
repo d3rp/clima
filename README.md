@@ -1,21 +1,12 @@
-# Quick and dirty cli templating
+# fissle - Quick command line interfaces
 
-Create a semi-self-documenting command line interface boilerplate loading configuration
+Create a semi-self-documenting command line interface that handles loading configuration
 files and enabling env variable overloading in addition to command line arguments
 by defining a simple schema of the configuration and a class with your "business logic".
 
-In other words, use this to wrap your scripts as command line commands without
-fussing about and maintaining argument parsing and duplicating comments for help or remembering
-what the arguments were and did
-while still having the typical use experience of a cli program (e.g. --help, subcommands, ...).
-This implementation is focused on a premise that for a simple script you have a global configuration which
-would be used through out the user code i.e. a context for the program. That configuration
-is populated with given arguments falling back on
-defaults in the code and some further complimentary options.
-
 Example: this is a minimal required setup for having configurations and a command line interface ready for use:
 
-    from clinfig import c, NamedTuple
+    from fissle import c, NamedTuple
     
     @c
     class C(NamedTuple):
@@ -26,7 +17,16 @@ Example: this is a minimal required setup for having configurations and a comman
         def foo(self):
             # using configuration
             print(c.a)
-    
+ 
+In other words, use this to wrap your scripts as command line commands without
+fussing about and maintaining argument parsing and duplicating comments for help or remembering
+what the arguments were and did
+while still having the typical use experience of a cli program (e.g. --help, subcommands, ...).
+This implementation is focused on a premise that for a simple script you have a global configuration which
+would be used through out the user code i.e. a context for the program. That configuration
+is populated with given arguments falling back on
+defaults in the code and some further complimentary options.
+   
 Should work for linux, macos and windows.
 
 ## Preliminary installations
@@ -68,7 +68,7 @@ parts in it.
 
 First import the required components:
 
-    from clinfig import c, NamedTuple
+    from fissle import c, NamedTuple
     
 In your code define the schema as a NamedTuple decorating it with `c`:
 
@@ -110,11 +110,11 @@ Also, to enable autocompletion in IDEs, this hack is needed for the time being:
 
     c: Configuration = c
 
-Put it in the "global space" just after defining the template. See the `tester/__main__.py` for a specific example.
+Put it in the "global space" e.g. just after defining the template. See the `tester/__main__.py` for a specific example.
 
 When all is complete, the imported `c` variable should have all the bits and pieces for the configuration. It can be
 used inside the Cli class as well as imported around the codebase thus encapsulating all the configurations into one
-container with quick access with attributes `c.a`, `c.x`, ...
+container with quick access with attributes `c.a`, `c.x`, etc...
 
 ### Running the cli
 
@@ -131,7 +131,7 @@ $ tester subcommand-foo -- -h
 
 Type:        method
 String form: <bound method Cli.subcommand_foo of <__main__.Cli object at 0x000002995AD74BE0>>
-File:        C:\Users\foobar\code\py\clinfig\tester\__main__.py
+File:        C:\Users\foobar\code\py\fissle\tester\__main__.py
 Line:        18
 Docstring:   This will be shown in --help for subcommand-foo
 Args:
@@ -183,7 +183,7 @@ documentation for nice additional features such as:
 This is just a tool to slap together a cli program in python, so you don't have to resort to bash. The intention is to
 get something reasonably configurable and generic up and running as fast as possible. I can't bother to memorize
 argparses syntax, even though it's a very good package. Also click works nice for more elaborate things though fire is
-my personal favourite for the moment. None of those have 
+my personal favourite for the time being.
 
 ## DONE:
 
@@ -198,7 +198,7 @@ my personal favourite for the moment. None of those have
 * c++ template like behaviour in which you can define the named tuple with the cli class
   * code completion should work in the IDE (DONE: a hack around this..)
   * configure should know to chain config file with params 
-* Configuration file requires copying clinfig in the same directory with the user code
+* Configuration file requires copying fissle in the same directory with the user code
   * location independent now
 * parsing configuration and help/description require separate steps
   * would be nice to have a single point of access and import requirement
