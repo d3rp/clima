@@ -1,7 +1,9 @@
 from typing import NamedTuple
-from clinfig import prepare, c
+# from clinfig import prepare, c
+from clinfig import c
 
 
+@c
 class Configuration(NamedTuple):
     a: str = 'A'  # a description
     x: int = 1  # x description
@@ -11,10 +13,8 @@ class Configuration(NamedTuple):
 c: Configuration = c
 
 
+@c
 class Cli:
-    def __init__(self, **cli_args):
-        c(cli_args, Configuration())
-
     def subcommand_foo(self):
         """This will be shown in --help for subcommand-foo"""
         print('foo')
@@ -26,10 +26,3 @@ class Cli:
         print('bar')
         print(repr(c))
 
-
-def main():
-    prepare(Cli, Configuration())
-
-
-if __name__ == '__main__':
-    main()

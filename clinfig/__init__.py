@@ -9,7 +9,7 @@ from fire import Fire
 from functools import lru_cache
 import os
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 C = TypeVar('C', bound=NamedTuple)
 
@@ -55,30 +55,83 @@ def read_config(_filepath='test.cfg') -> dict:
     return dict(file_config['Default'])
 
 
+state = {
+    'schema': None,
+    'generated': None,
+}
+
+
+def schema(cls):
+    # c: type(cls) = c
+    state['schema'] = cls()
+
+    return cls
+
+
+def cli(cls):
+    class Generated(cls, metaclass=Foo):
+        def __init__(self, **cli_args):
+            c(cli_args, state['schema'])
+
+    state['generated'] = Generated
+    init()
+    return Generated
+
+
+def init():
+    prepare(state['generated'], state['schema'])
+
+
+class Foo(type):
+    def __new__(cls, name, bases, nmspc):
+        # pprint(name)
+        # pprint(bases)
+        # pprint(nmspc)
+        return super().__new__(cls, name, bases, nmspc)
+
+    def __init__(cls, name, bases, nmspc):
+        # print('oh hi')
+        pass
+
+
 class Configurable:
     # configured: NewType('conf', C) = None
     configured: C = None
 
-    def __call__(self, params: dict = None, configuration_tuple: Generic[C] = None) -> C:
+    def __initialize(self, params: dict, configuration_tuple: Generic[C]) -> C:
+        config_file = self.__get_config_path(configuration_tuple)
+        if config_file is not None:
+            config_dict = filter_fields(read_config(config_file), configuration_tuple),
+        else:
+            config_dict = {}
 
-        is_initializing = (params is not None and configuration_tuple is not None)
-        if is_initializing:
-
-            config_file = self.__get_config_path(configuration_tuple)
-            if config_file is not None:
-                config_dict = filter_fields(read_config(config_file), configuration_tuple),
-            else:
-                config_dict = {}
-                
-            configuration = NewType('conf', C)
-            self.configured = configuration(dict(ChainMap(
-                params,
-                config_dict,
-                filter_fields(os.environ, configuration_tuple),
-                configuration_tuple._asdict()
-            )))
+        configuration = NewType('conf', C)
+        self.configured = configuration(dict(ChainMap(
+            params,
+            config_dict[0],
+            filter_fields(os.environ, configuration_tuple),
+            configuration_tuple._asdict()
+        )))
 
         return self.configured
+
+    # def __call__(self, params: dict = None, configuration_tuple: Generic[C] = None) -> C:
+    def __call__(self, a=None, b=None):
+        is_initializing = (a is not None and b is not None)
+        if is_initializing:
+            # print('initializing')
+            return self.__initialize(a, b)
+
+        is_decorating = (a is not None and b is None)
+        if is_decorating:
+            # print(f'decorating:')
+            is_schema = any(_cls is tuple for _cls in inspect.getmro(a))
+            if is_schema:
+                # print(f'schema: {inspect.getmro(a)}')
+                return schema(a)
+            else:
+                # print('cli')
+                return cli(a)
 
     def __get_config_path(self, configuration_tuple):
         client_file = Path(inspect.getfile(configuration_tuple.__class__))
@@ -160,7 +213,7 @@ def prepare_signatures(cls, nt: C):
 def prepare(cls, nt: C):
     prepare_signatures(cls, nt)
     wrap_method_docs(cls, nt)
-    c()
+    # c()
 
     # __c(Doc.params_with_defs(nt), nt)
     # __c.configured = configuration_factory(nt)
