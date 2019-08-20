@@ -13,6 +13,20 @@ would be used through out the user code i.e. a context for the program. That con
 is populated with given arguments falling back on
 defaults in the code and some further complimentary options.
 
+Example: this is a minimal required setup for having configurations and a command line interface ready for use:
+
+    from clinfig import c, NamedTuple
+    
+    @c
+    class C(NamedTuple):
+       a: int = 1
+     
+    @c
+    class Cli:
+        def foo(self):
+            # using configuration
+            print(c.a)
+    
 Should work for linux, macos and windows.
 
 ## Preliminary installations
@@ -44,7 +58,7 @@ used/activated
 
 ### Dependencies
 
-* fire - python-fire from google does the cli wrapping
+* fire - [python-fire](https://github.com/google/python-fire) from google does the cli wrapping
 
 
 ## Usage
@@ -52,8 +66,13 @@ used/activated
 See the example file in `tester/__main__.py`. Here's a run down of the individual
 parts in it.
 
-In your code define the schema as a NamedTuple:
+First import the required components:
 
+    from clinfig import c, NamedTuple
+    
+In your code define the schema as a NamedTuple decorating it with `c`:
+
+    @c
     class Configuration(NamedTuple):
         a: str = 'A'  # a description
         x: int = 1  # x description
@@ -69,10 +88,8 @@ example). Those have a set way:
 value of 'A'. The comment after it is parsed for the command line so it's not redundant. All of these
 parts will be parsed for the '--help' for the subcommands of the cli, which should be defined as follows:
 
+    @c
     class Cli:
-        def __init__(self, **cli_args):
-            c(**cli_args, Configuration())
-
         def subcommand_foo(self):
             """This will be shown in --help for subcommand-foo"""
             print('foo')
@@ -83,32 +100,12 @@ parts will be parsed for the '--help' for the subcommands of the cli, which shou
             """This will be shown in --help for subcommand-bar"""
             print('bar')
 
-The `__init__` works as a funnel for the command line arguments baking them into the configuration `c` i.e.
-the argument parsing is done here:
-
-    def __init__(self, **cli_args):
-        c(cli_args, Configuration())
-    
 The methods are parsed as subcommands for the cli and their respective doc strings will show in the 
 subcommands' help print out. Note the usage of the parsed configuration `c`:
 
     print(c.a)
     print(c.x)
    
-The implicit step to enable this magic is importing c from *clinfig*:
-
-    from clinfig import c
-            
-Lsstly, the preparation for the command line --help:
-
-    def main():
-        prepare(Cli, Configuration())
-        
-In which the defined class for the command line business logic and the schema class (NamedTuple) is given as the first parameter for the
-previously imported prepare function:
-
-    from clinfig import prepare
-    
 Also, to enable autocompletion in IDEs, this hack is needed for the time being:
 
     c: Configuration = c
@@ -126,7 +123,7 @@ container with quick access with attributes `c.a`, `c.x`, ...
     tester subcommand-foo -- -h
     tester subcommand-bar
 
-Output should resemble this:
+Output should resemble this (fire v0.1.3 prints out Args, fire v0.2.1 doesn't (though looks much nicer))
 
     
 ```
@@ -146,17 +143,17 @@ Usage:       __main__.py subcommand-foo [--X ...]
 
 ## Configuration file and environment variables
 
-The 'prepare' function chains multiple configuration steps in order of priority (lower number overrides higher number):
+The `c` decorator/configuration chains multiple configuration options together in order of priority (lower number overrides higher number):
 
 1. command line arguments
 1. Environment variables
 1. configuration file definitions
 1. defaults in the schema/template/namedtuple class
 
-The configuration file should be named `test.cfg` (see TODO) and have an ini type formatting with
+The configuration file should be named with postfix `.cfg` e.g. `foo.cfg` and have an ini type formatting with
 a 'Default' section:
 
-    # test.cfg
+    # foo.cfg
     [Default]
     x = 2
 
@@ -168,12 +165,26 @@ Same applies for the env variables.
     
 ## Installing as command line program i.e. a command
 
-    # Create pyproject.toml
-    flit init 
-    
     # Install dev version (omit --symlink for more permanent solution):
     flit install --symlink
    
+## Out-of-the-box features via Fire
+
+See the [Python Fire's Flags](https://github.com/google/python-fire/blob/master/docs/using-cli.md#python-fires-flags)
+documentation for nice additional features such as:
+
+    # e.g. tester.py is our cli program
+    tester.py subcommand-foo -- --trace
+    tester.py -- --interactive
+    tester.py -- --completion
+    
+## Why another cli framework?
+
+This is just a tool to slap together a cli program in python, so you don't have to resort to bash. The intention is to
+get something reasonably configurable and generic up and running as fast as possible. I can't bother to memorize
+argparses syntax, even though it's a very good package. Also click works nice for more elaborate things though fire is
+my personal favourite for the moment. None of those have 
+
 ## DONE:
 
 * Show params in help / How to pass namedtuple's signature programmatically to the Cli functions?    
@@ -184,21 +195,28 @@ Same applies for the env variables.
   * hardcoded defaults mechanism
 * config parser
 * decorator or some other wrapper for the cli-class to configure with given parameters without boilerplate
+* c++ template like behaviour in which you can define the named tuple with the cli class
+  * code completion should work in the IDE (DONE: a hack around this..)
+  * configure should know to chain config file with params 
+* Configuration file requires copying clinfig in the same directory with the user code
+  * location independent now
+* parsing configuration and help/description require separate steps
+  * would be nice to have a single point of access and import requirement
+* base level help (<script> -- -h) doesn't printout the subcommands
+  * fixed in fire v0.2.1
+* look into autocompletion options (iirc, fire might have sth out-of-the-box)
+  * documented
   
 ## TODO:
 
 * generate man page in a reasonable fashion
-* c++ template like behaviour in which you can define the named tuple with the cli class
-  * code completion should work in the IDE (DONE: a hack around this..)
-  * configure should know to chain config file with params
-  * ...
+  * though fire v0.2.1 help looks like a man page
 * maybe a logging setup (--dryrun)
   * default debug logging wrapper that would log every function called
 * tooling and installation helpers
-  * flit is not working on windows at least..
+  * flit is not working on windows at least.. (works with git bash)
   * dephell or alternative to allow dev with whatever setup
-* Configuration file requires copying clinfig in the same directory with the user code
-* parsing configuration and help/description require separate steps
-  * would be nice to have a single point of access and import requirement
-* base level help (<script> -- -h) doesn't printout the subcommands
-* look into autocompletion options (iirc, fire might have sth out-of-the-box)
+* fix doc string and args/parameter help for fire v0.2.1
+* better name
+* some sane tests
+* clean code from `__init__`

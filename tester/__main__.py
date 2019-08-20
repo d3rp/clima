@@ -1,6 +1,4 @@
-from typing import NamedTuple
-# from clinfig import prepare, c
-from clinfig import c
+from clinfig import c, NamedTuple
 
 
 @c
@@ -25,4 +23,3 @@ class Cli:
         """This will be shown in --help for subcommand-bar"""
         print('bar')
         print(repr(c))
-

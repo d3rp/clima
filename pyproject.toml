@@ -8,6 +8,3 @@ author = "Joni Turunen"
 author-email = "rojun.itu@gmail.com"
 home-page = "http://typingducks.com"
 classifiers = ["License :: OSI Approved :: MIT License"]
-
-[tool.flit.scripts]
-tester = "tester.__main__:main"
