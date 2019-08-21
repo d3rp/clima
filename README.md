@@ -29,37 +29,11 @@ defaults in the code and some further complimentary options.
    
 Should work for linux, macos and windows.
 
-## Preliminary installations
+## Installing
 
-**Note**:
-If you prefer some other tooling, maybe try out [DepHell](https://github.com/dephell/dephell)
-to transform this from pipenv to requirements.txt etc.. (or what ever floats you boat)
-
-### pipenv
-
-    # From the beginning...
-    pip install -U pip pipenv
+    pip install --user fissle
     
-    # on some mac configurations, when pipenv isn't included in the path..
-    sudo -H pip install -U pip pipenv
-    
-### pipenv environment
-
-    pipenv install --ignore-pipfile
-    
-    # activate the environment alternative 1
-    pipenv shell
-    
-    # activate the environment alternative 2
-    pipenv run <command>
-    
-**Note**: consecutive steps presume the pipenv environment is being
-used/activated
-
-### Dependencies
-
-* fire - [python-fire](https://github.com/google/python-fire) from google does the cli wrapping
-
+See alternative options at the end of the README
 
 ## Usage
 
@@ -184,6 +158,38 @@ This is just a tool to slap together a cli program in python, so you don't have 
 get something reasonably configurable and generic up and running as fast as possible. I can't bother to memorize
 argparses syntax, even though it's a very good package. Also click works nice for more elaborate things though fire is
 my personal favourite for the time being.
+
+## Installing from source
+
+**Note**:
+If you prefer some other tooling, maybe try out [DepHell](https://github.com/dephell/dephell)
+to transform this from pipenv to requirements.txt etc.. (or what ever floats you boat)
+
+### pipenv
+
+    # From the beginning...
+    pip install -U pip pipenv
+    
+    # on some mac configurations, when pipenv isn't included in the path..
+    sudo -H pip install -U pip pipenv
+    
+### pipenv environment
+
+    pipenv install --ignore-pipfile
+    
+    # activate the environment alternative 1
+    pipenv shell
+    
+    # activate the environment alternative 2
+    pipenv run <command>
+    
+**Note**: consecutive steps presume the pipenv environment is being
+used/activated
+
+### Dependencies
+
+* fire - [python-fire](https://github.com/google/python-fire) from google does the cli wrapping
+
 
 ## DONE:
 
