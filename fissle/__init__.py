@@ -11,7 +11,7 @@ import os
 __version__ = '0.0.2'
 
 
-class Config:
+class ConfigFile:
     """Configuration file (sth.cfg) handling"""
 
     @staticmethod
@@ -25,10 +25,10 @@ class Config:
     @staticmethod
     def find_cfg(f):
         f = Path(f)
-        cfgs = list(Config.cfgs_gen(f))
+        cfgs = list(ConfigFile.cfgs_gen(f))
         if len(cfgs) == 0:
-            if Config.is_in_module(f):
-                return Config.find_cfg(f.parent)
+            if ConfigFile.is_in_module(f):
+                return ConfigFile.find_cfg(f.parent)
             else:
                 return None
         else:
@@ -53,7 +53,7 @@ class Config:
                 p = client_file / p
         else:
             p = client_file
-        config_file = Config.find_cfg(p)
+        config_file = ConfigFile.find_cfg(p)
 
         return config_file
 
@@ -67,10 +67,12 @@ decorators_state = {
 class Decorators:
     """Decorator helpers for the client interface (Configurable)"""
 
+    @staticmethod
     def schema(cls):
         decorators_state['schema'] = cls()
         return cls
 
+    @staticmethod
     def cli(cls):
         state = decorators_state
 
@@ -98,9 +100,9 @@ class Configurable:
 
     def __initialize(self, params: dict, configuration_tuple):
         """Chains all configuration options together"""
-        config_file = Config.get_config_path(configuration_tuple)
+        config_file = ConfigFile.get_config_path(configuration_tuple)
         if config_file is not None:
-            config_dict = self.__filter_fields(Config.read_config(config_file), configuration_tuple),
+            config_dict = self.__filter_fields(ConfigFile.read_config(config_file), configuration_tuple),
         else:
             config_dict = {}
 
