@@ -1,14 +1,14 @@
-""""Slim boilerplate for cli scripts"""
+"""Simple boilerplate for cli scripts"""
 
 from collections import ChainMap, OrderedDict
 import inspect
 import configparser
 from pathlib import Path
 from fire import Fire
-from typing import NamedTuple  # Facilitates importing from one location
+from typing import NamedTuple as Schema # Facilitates importing from one location
 import os
 
-__version__ = '0.0.3'
+__version__ = '0.1.0'
 
 
 class ConfigFile:
@@ -76,13 +76,22 @@ class Decorators:
     def cli(cls):
         state = decorators_state
 
-        class Generated(cls):
-            def __init__(self, **cli_args):
-                c(cli_args, state['schema'])
+        def init(self, **cli_args):
+            """Generated init"""
+            c(cli_args, state['schema'])
 
-        state['generated'] = Generated
+        cls_attrs = dict(
+            # __slots__=cls.__slots__,
+            __init__=init,
+            __repr__=cls.__repr__,
+            **{k: v for k, v in cls.__dict__.items() if not k.startswith('_')}
+        )
+
+        _Cli = type('Cli', (cls,), cls_attrs)
+        state['generated'] = _Cli
+
         prepare(state['generated'], state['schema'])
-        return Generated
+        return _Cli
 
 
 class Configurable:
@@ -106,9 +115,10 @@ class Configurable:
         else:
             config_dict = {}
 
+        print(repr(config_dict))
         self.configured = dict(ChainMap(
             params,
-            config_dict[0],
+            config_dict,
             self.__filter_fields(os.environ, configuration_tuple),
             configuration_tuple._asdict()
         ))
@@ -162,7 +172,7 @@ class Doc:
                 str(arg_and_def).strip()
                 for arg_and_def in src_line.split(':')
             )
-            for src_line in inspect.getsourcelines(N.__class__)[0]
+            for src_line in inspect.getsourcelines(N.__class__)[0][1:]
             if src_line.startswith(' ')
         )
         return OrderedDict(params_with_definitions)

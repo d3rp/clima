@@ -1,15 +1,15 @@
-# fissle - Quick command line interfaces
+# clima - Quick command line interfaces
 
 Create a semi-self-documenting command line interface that handles loading configuration
 files and enabling env variable overloading in addition to command line arguments
 by defining a simple schema of the configuration and a class with your "business logic".
 
-Example: this is a minimal required setup for having configurations and a command line interface ready for use:
+Example: this is the required setup for having configurations and a command line interface ready for use:
 
-    from fissle import c, NamedTuple
+    from clima import c, Schema
     
     @c
-    class C(NamedTuple):
+    class C(Schema):
        a: int = 1
      
     @c
@@ -31,7 +31,7 @@ Should work for linux, macos and windows.
 
 ## Installing
 
-    pip install --user fissle
+    pip install --user clima
     
 See alternative options at the end of the README
 
@@ -42,16 +42,16 @@ parts in it.
 
 First import the required components:
 
-    from fissle import c, NamedTuple
+    from clima import c, Schema
     
-In your code define the schema as a NamedTuple decorating it with `c`:
+In your code define the schema as a Schema decorating it with `c`:
 
     @c
-    class Configuration(NamedTuple):
+    class Configuration(Schema):
         a: str = 'A'  # a description
         x: int = 1  # x description
 
-"Configuration" is an arbitrary name, no magic there. The inherited NamedTuple
+"Configuration" is an arbitrary name, no magic there. The inherited `Schema` class
 simplifies the schema's templating to defining just the attributes (i.e. `a` and `x` in this
 example). Those have a set way:
 
@@ -105,7 +105,7 @@ $ tester subcommand-foo -- -h
 
 Type:        method
 String form: <bound method Cli.subcommand_foo of <__main__.Cli object at 0x000002995AD74BE0>>
-File:        C:\Users\foobar\code\py\fissle\tester\__main__.py
+File:        C:\Users\foobar\code\py\clima\tester\__main__.py
 Line:        18
 Docstring:   This will be shown in --help for subcommand-foo
 Args:
@@ -159,6 +159,12 @@ get something reasonably configurable and generic up and running as fast as poss
 argparses syntax, even though it's a very good package. Also click works nice for more elaborate things though fire is
 my personal favourite for the time being.
 
+Also docopt looks very nice, but it doesn't provide autocompletion and all the configuration chaining magic I was after.
+
+* [docopt](https://docopt.org)
+* [fire](https://github.com/google/python-fire)
+* [click](https://click.palletsprojects.com)
+
 ## Installing from source
 
 **Note**:
@@ -175,7 +181,7 @@ to transform this from pipenv to requirements.txt etc.. (or what ever floats you
     
 ### pipenv environment
 
-    pipenv install --ignore-pipfile
+    pipenv install
     
     # activate the environment alternative 1
     pipenv shell
@@ -204,7 +210,7 @@ used/activated
 * c++ template like behaviour in which you can define the named tuple with the cli class
   * code completion should work in the IDE (DONE: a hack around this..)
   * configure should know to chain config file with params 
-* Configuration file requires copying fissle in the same directory with the user code
+* Configuration file requires copying clima in the same directory with the user code
   * location independent now
 * parsing configuration and help/description require separate steps
   * would be nice to have a single point of access and import requirement
@@ -217,6 +223,7 @@ used/activated
 
 * generate man page in a reasonable fashion
   * though fire v0.2.1 help looks like a man page
+* readme's pipenv section doesn't make much sense..
 * maybe a logging setup (--dryrun)
   * default debug logging wrapper that would log every function called
 * tooling and installation helpers
@@ -226,3 +233,6 @@ used/activated
 * better name
 * some sane tests
 * clean code from `__init__`
+* better output for subcommands
+  * fire v0.2.1 has this, but hides the parameter parsing and looks awful on windows
+* implicitly map <cmd> -h -> <cmd> -- -h
