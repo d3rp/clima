@@ -10,7 +10,7 @@ Example: this is the required setup for having configurations and a command line
     
     @c
     class C(Schema):
-       a: int = 1
+       a = 1
      
     @c
     class Cli:
@@ -55,12 +55,12 @@ In your code define the schema as a Schema decorating it with `c`:
 simplifies the schema's templating to defining just the attributes (i.e. `a` and `x` in this
 example). Those have a set way:
 
-        # attribute: type = default value  # Description for the --help
+        # attribute[: type] = default value  [# Description for the --help]
         a: str = 'A'  # a description
        
 `a` is the attribute which can be called in the code later with `c.a`. It has a type of 'str', default
-value of 'A'. The comment after it is parsed for the command line so it's not redundant. All of these
-parts will be parsed for the '--help' for the subcommands of the cli, which should be defined as follows:
+value of 'A'. The comment after it is parsed for the command line so it's not redundant. The values in square brackets `[]` are
+optional. All of these parts will be parsed for the '--help' for the subcommands of the cli, which should be defined as follows:
 
     @c
     class Cli:
@@ -236,3 +236,4 @@ used/activated
 * better output for subcommands
   * fire v0.2.1 has this, but hides the parameter parsing and looks awful on windows
 * implicitly map <cmd> -h -> <cmd> -- -h
+* way to define schema within the cli class

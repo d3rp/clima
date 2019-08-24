@@ -8,6 +8,7 @@ fire = "==0.1.3"
 flit = "*"
 clima = "*"
 e1839a8 = {editable = true,path = "."}
+better-exceptions = "*"
 
 [dev-packages]
 pytest = "*"

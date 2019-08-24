@@ -5,7 +5,7 @@ import inspect
 import configparser
 from pathlib import Path
 from fire import Fire
-from typing import NamedTuple as Schema # Facilitates importing from one location
+from typing import NamedTuple as Schema  # Facilitates importing from one location
 import os
 
 __version__ = '0.1.0'
@@ -42,7 +42,11 @@ class ConfigFile:
 
         file_config = configparser.ConfigParser()
         file_config.read(filepath)
-        return dict(file_config['Default'])
+        if 'Default' in file_config:
+            return dict(file_config['Default'])
+        else:
+            print(f'warning: config file found at {str(filepath)}, but it was missing section named [Default]')
+            return {}
 
     @staticmethod
     def get_config_path(configuration_tuple):
@@ -90,12 +94,12 @@ class Decorators:
         _Cli = type('Cli', (cls,), cls_attrs)
         state['generated'] = _Cli
 
-        prepare(state['generated'], state['schema'])
         return _Cli
 
 
 class Configurable:
     """Configuration management"""
+    # TODO: idiomatic handling for use cases that apply to NamedTuple
     configured = None
 
     def __filter_fields(self, d: dict, nt):
@@ -111,11 +115,10 @@ class Configurable:
         """Chains all configuration options together"""
         config_file = ConfigFile.get_config_path(configuration_tuple)
         if config_file is not None:
-            config_dict = self.__filter_fields(ConfigFile.read_config(config_file), configuration_tuple),
+            config_dict = self.__filter_fields(ConfigFile.read_config(config_file), configuration_tuple)
         else:
             config_dict = {}
 
-        print(repr(config_dict))
         self.configured = dict(ChainMap(
             params,
             config_dict,
@@ -125,7 +128,7 @@ class Configurable:
 
         return self.configured
 
-    def __call__(self, a=None, b=None):
+    def __call__(self, a=None, b=None, *, noprepare=False):
         """Handles delegating method overloading acting as a decorator and initiator for the
         chain configuration"""
         is_initializing = (a is not None and b is not None)
@@ -138,7 +141,11 @@ class Configurable:
             if is_schema:
                 return Decorators.schema(a)
             else:
-                return Decorators.cli(a)
+                cli = Decorators.cli(a)
+                if not noprepare:
+                    prepare(decorators_state['generated'], decorators_state['schema'])
+
+                return cli
 
     def __repr__(self):
         return repr(self.configured)
@@ -150,6 +157,10 @@ class Configurable:
 
         return res
 
+    def __getitem__(self, item):
+        print(item)
+        return self.configured[item]
+
 
 c = Configurable()
 
@@ -159,8 +170,8 @@ class Doc:
 
     @staticmethod
     def wrap_method_docs(cls: object, nt):
-        methods = [m.object for m in inspect.classify_class_attrs(cls) if
-                   m.kind == 'method' and not m.name.startswith('_')]
+        methods = [m.object for m in inspect.classify_class_attrs(cls)
+                   if m.kind == 'method' and not m.name.startswith('_')]
         for m in methods:
             Doc.prepare_doc(nt, m)
 
@@ -170,7 +181,7 @@ class Doc:
         params_with_definitions = tuple(
             tuple(
                 str(arg_and_def).strip()
-                for arg_and_def in src_line.split(':')
+                for arg_and_def in src_line.split(':', 1)
             )
             for src_line in inspect.getsourcelines(N.__class__)[0][1:]
             if src_line.startswith(' ')
@@ -179,14 +190,15 @@ class Doc:
 
     @staticmethod
     def attr_map(N):
-        """Mapping for the schemas details"""
+        """Mapping for the schema's details"""
         _attr_map = {}
         for param, _def in Doc.params_with_defs(N).items():
-            _type, def_desc = _def.split('=')
+            _type, def_desc = _def.split('=', 1)
             _type = _type.strip()
 
+            # TODO: this won't handle # in strings ...
             if '#' in def_desc:
-                default, description = def_desc.split('#')
+                default, description = def_desc.split('#', 1)
                 default = default.strip()
                 description = description.strip()
             else:
@@ -230,9 +242,10 @@ def prepare_signatures(cls, nt):
 
     Works in-place, returns None
     """
+    # methods = {k: cls.__dict__[k] for k in inspect.getmembers(cls, inspect.ismethod)}
     methods = {
         k: v for k, v in cls.__dict__.items()
-        if not k.startswith('_')
+        if not k.startswith('_') and inspect.isfunction(v)
     }
     for m_name, method in methods.items():
         params = [
