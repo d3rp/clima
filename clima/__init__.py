@@ -8,7 +8,7 @@ from fire import Fire
 from typing import NamedTuple as Schema  # Facilitates importing from one location
 import os
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class ConfigFile:

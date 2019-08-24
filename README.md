@@ -1,5 +1,7 @@
 # clima - Quick command line interfaces
 
+[![Build status](https://travis-ci.com/d3rp/clima.svg?branch=master)](https://travis-ci.com/d3rp/clima) [![Python versions](https://img.shields.io/pypi/pyversions/clima)]() [![Dependencies](https://img.shields.io/librariesio/github/d3rp/clima)]() [![PyPI license](https://img.shields.io/pypi/l/clima)]()
+
 Create a semi-self-documenting command line interface that handles loading configuration
 files and enabling env variable overloading in addition to command line arguments
 by defining a simple schema of the configuration and a class with your "business logic".

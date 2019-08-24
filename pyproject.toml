@@ -7,11 +7,25 @@ module = "clima"
 author = "Joni Turunen"
 author-email = "rojun.itu@gmail.com"
 home-page = "https://github.com/d3rp/clima.git"
-classifiers = ["License :: OSI Approved :: MIT License"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+]
 requires = ["fire==0.1.3"]
 description-file = "README.md"
 requires-python = ">=3.5"
-keywords = "cli"
+keywords = "cli template command schema fire quick simple command-line"
 
 [tool.flit.metadata.requires-extra]
 dev = ["pytest"]
@@ -26,7 +40,21 @@ name = "clima"
 version = "0.1.0"
 description = "Simple boilerplate for cli scripts"
 keywords = ["cli"]
-classifiers = ["License :: OSI Approved :: MIT License"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+]
 homepage = "https://github.com/d3rp/clima.git"
 authors = ["Joni Turunen <rojun.itu@gmail.com>"]
 readme = "README.md"
