@@ -1,10 +1,9 @@
-# clima - Quick command line interfaces
+# clima - command line interface with a schema
 
 [![Build status](https://travis-ci.com/d3rp/clima.svg?branch=master)](https://travis-ci.com/d3rp/clima) [![Python versions](https://img.shields.io/pypi/pyversions/clima)]() [![Dependencies](https://img.shields.io/librariesio/github/d3rp/clima)]() [![PyPI license](https://img.shields.io/pypi/l/clima)]()
 
-Create a semi-self-documenting command line interface that handles loading configuration
-files and enabling env variable overloading in addition to command line arguments
-by defining a simple schema of the configuration and a class with your "business logic".
+Create a command line interface out of your script with quick default behaviour for configuration, minimal setup and less maintenance. It handles loading and parsing configuration
+files and overriding it with env variables by defining a simple schema of the configuration and a class with your "business logic".
 
 Example: this is the required setup for having configurations and a command line interface ready for use:
 
@@ -20,16 +19,17 @@ Example: this is the required setup for having configurations and a command line
             # using configuration
             print(c.a)
  
-In other words, use this to wrap your scripts as command line commands without
-fussing about and maintaining argument parsing and duplicating comments for help or remembering
-what the arguments were and did
-while still having the typical use experience of a cli program (e.g. --help, subcommands, ...).
-This implementation is focused on a premise that for a simple script you have a global configuration which
-would be used through out the user code i.e. a context for the program. That configuration
-is populated with given arguments falling back on
-defaults in the code and some further complimentary options.
+## Long description
+
+In other words, use this to wrap your scripts as command line commands without resorting to bash or maintaining argument parsing in python. There shouldn't be a need of duplicating comments for `--help` to remember what the arguments were and did. This decorator magic offers the typical use experience of a cli program (e.g. argument parsing and validation, --help, subcommands, ...).
+
+The implementation is focused on a premise that for a simple script there's usually a script wide global configuration which would be used through out the user code i.e. a context for the program that is refered to in different parts of the code. That configuration is populated with given arguments falling back on defaults in the code and some further complimentary options and then made accessible via a simple global `c` variable around the code base with very little additional effort. With a small adjustment this can made to autocomplete in IDEs. This helps when the schema of the configuration grows larger.
    
+## Examples and platforms
+
 Should work for linux, macos and windows.
+
+More examples in the examples directory with printouts of the defined subcommands and helps.
 
 ## Installing
 
@@ -156,12 +156,11 @@ documentation for nice additional features such as:
     
 ## Why another cli framework?
 
-This is just a tool to slap together a cli program in python, so you don't have to resort to bash. The intention is to
-get something reasonably configurable and generic up and running as fast as possible. I can't bother to memorize
-argparses syntax, even though it's a very good package. Also click works nice for more elaborate things though fire is
-my personal favourite for the time being.
+This is just a tool to slap together a cli program in python instead that grew out of the need of having a build automation system and an entrypoint script to build various flavours of C++ projects. The intention is to get something reasonably configurable and generic up and running as fast as possible while still having the "power" of python. I can't bother to memorize argparses syntax, even though it's a very good package. Also click works nice for more elaborate things though fire is my personal favourite for the time being. Often times when I kick off a bash script for this it ends up too elaborate very quick and then I miss python.
 
 Also docopt looks very nice, but it doesn't provide autocompletion and all the configuration chaining magic I was after.
+
+Other options for full cli experience:
 
 * [docopt](https://docopt.org)
 * [fire](https://github.com/google/python-fire)

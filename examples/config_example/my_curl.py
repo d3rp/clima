@@ -15,14 +15,27 @@ c: C = c
 
 @c
 class MyCurl:
-    # data = ''
-
     def _configure(self):
         if c.debug:
             logging.getLogger('requests').setLevel(logging.DEBUG)
 
     def headers(self):
-        """This here, prints my age"""
+        """GET query to the url and print out the headers of the response"""
         self._configure()
         res = requests.get(c.url)
         print(res.headers)
+
+
+############################################################
+# $ ./my_curl headers -- -h
+#
+#Type:        method
+#String form: <bound method MyCurl.headers of <clima.Cli object at 0x0000020FA7324A58>>
+#File:        ./examples/config_example/my_curl.py
+#Line:        22
+#Docstring:   GET query to the url and print out the headers of the response
+#Args:
+#    --debug (bool): Enable verbose printout (Default is False)
+#    --url (str): This will be overriden by foo.cfg (Default is 'https://pypi.org')
+#
+#Usage:       my_curl.py headers [--URL ...]
