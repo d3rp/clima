@@ -9,7 +9,7 @@ import os
 from clima.schema import MetaSchema
 from clima import doc, configfile
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 decorators_state = {
     'schema': None,
