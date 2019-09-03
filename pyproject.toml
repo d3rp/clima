@@ -38,7 +38,7 @@ test = ["pytest"]
 
 [tool.poetry]
 name = "clima"
-version = "0.1.0"
+version = "0.1.1"
 description = "Simple boilerplate for cli scripts"
 keywords = ["cli"]
 classifiers = [
@@ -70,7 +70,8 @@ pytest = "*"
 [tool.poetry.extras]
 tests = ["pytest"]
 
-[tool.dephell.main]
+
+[tool.dephell.flittopoetry]
 from = {format = "flit", path = "pyproject.toml"}
 to = {format = "poetry", path = "pyproject.toml"}
 
@@ -94,8 +95,12 @@ to = {format = "setuppy", path = "setup.py"}
 from = {format = "poetry", path = "pyproject.toml"}
 to = {format = "pipfile", path = "Pipfile"}
 
+[tool.dephell.main]
+versioning = "semver"
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "poetry", path = "pyproject.toml"}
+
 [tool.dephell.pytest]
 from = {format = "poetry", path = "pyproject.toml"}
-envs = ["main", "tests"]
-tests = ["tests"]
-command = "python -m pytest tests"
+tests = ["tests", "README.md"]
+command = "python -m pytest -x tests/"
