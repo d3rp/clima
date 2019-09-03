@@ -38,7 +38,7 @@ test = ["pytest"]
 
 [tool.poetry]
 name = "clima"
-version = "0.3.0"
+version = "0.2.1"
 description = "Simple boilerplate for cli scripts"
 keywords = ["cli"]
 classifiers = [
@@ -70,6 +70,7 @@ twine = "*"
 
 [tool.poetry.extras]
 tests = ["pytest"]
+
 
 
 
