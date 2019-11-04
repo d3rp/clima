@@ -178,6 +178,51 @@ class TestTypeCasting(TestCase, SysArgvRestore):
         ]):
             assert type(getattr(c, k)) == valid
 
+    def test_builtins_post_init(self):
+        sys.argv = ['test', 'x']
+        values = {
+            'a': True,
+            'f': 1.0,
+            'i': ['b','b','b'],
+            'm': '1',
+        }
+        @c
+        class TypeGalore(Schema):
+            a: bool = 0
+            b: bytearray = 0
+            c: bytes = 0
+            d: complex = 0
+            e: dict = tuple(zip('aa', 'bb'))
+            f: float = 0
+            g: frozenset = {}
+            h: int = 0.0
+            i: list = 'aa'
+            # k: property = 0
+            l: set = [1, 2]
+            m: str = 0
+            n: tuple = []
+
+            def post_init(self, *args):
+                self.a = 1
+                self.f = 1
+                self.i = 'bbb'
+                self.m = 1
+
+        @c
+        class Cli:
+            def x(self):
+                """docstring"""
+                pass
+
+        for k, valid in zip('afim', [
+            bool,
+            float,
+            list,
+            str,
+        ]):
+            assert type(getattr(c, k)) == valid
+            assert getattr(c, k) == values[k]
+
 
 class TestConfigurable(TestCase, SysArgvRestore):
 
