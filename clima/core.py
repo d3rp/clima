@@ -4,7 +4,7 @@ import sys
 import os
 from functools import partial
 
-from fire import Fire
+from clima.fire import Fire
 
 from clima import schema, utils
 from clima import docstring, configfile
